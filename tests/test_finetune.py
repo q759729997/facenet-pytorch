@@ -96,6 +96,7 @@ if __name__ == "__main__":
     # print('resnet:{}'.format(resnet))
     # optimizer = optim.Adam(resnet.parameters(), lr=0.001)
     print([name for name, param in resnet.named_parameters()])
+    # 微调时，只重新训练输出层参数
     optim_params = [param for name, param in resnet.named_parameters() if name in {'logits.weight', 'logits.bias'}]
     print('optim_params:{}'.format(optim_params))
     optimizer = optim.Adam(optim_params)
