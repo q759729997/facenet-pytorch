@@ -258,7 +258,13 @@ class InceptionResnetV1(nn.Module):
         self.logits = nn.Linear(512, tmp_classes)
 
         if pretrained is not None:
-            load_weights(self, pretrained)
+            # load_weights(self, pretrained)
+            if pretrained == 'vggface2':
+                state_dict_path = os.path.join(os.path.dirname(__file__), '../data/20180402-114759-vggface2.pt')
+                state_dict = torch.load(state_dict_path)
+                self.load_state_dict(state_dict)
+            else:
+                raise Exception('缺少预训练模型')
 
         if self.num_classes is not None:
             self.logits = nn.Linear(512, self.num_classes)
@@ -298,6 +304,43 @@ class InceptionResnetV1(nn.Module):
         if self.classify:
             x = self.logits(x)
         return x
+
+
+def load_weights(mdl, name):
+    """Download pretrained state_dict and load into model.
+
+    Arguments:
+        mdl {torch.nn.Module} -- Pytorch model.
+        name {str} -- Name of dataset that was used to generate pretrained state_dict.
+
+    Raises:
+        ValueError: If 'pretrained' not equal to 'vggface2' or 'casia-webface'.
+    """
+    if name == 'vggface2':
+        features_path = 'https://drive.google.com/uc?export=download&id=1cWLH_hPns8kSfMz9kKl9PsG5aNV2VSMn'
+        logits_path = 'https://drive.google.com/uc?export=download&id=1mAie3nzZeno9UIzFXvmVZrDG3kwML46X'
+    elif name == 'casia-webface':
+        features_path = 'https://drive.google.com/uc?export=download&id=1LSHHee_IQj5W3vjBcRyVaALv4py1XaGy'
+        logits_path = 'https://drive.google.com/uc?export=download&id=1QrhPgn1bGlDxAil2uc07ctunCQoDnCzT'
+    else:
+        raise ValueError('Pretrained models only exist for "vggface2" and "casia-webface"')
+
+    model_dir = os.path.join(get_torch_home(), 'checkpoints')
+    os.makedirs(model_dir, exist_ok=True)
+
+    state_dict = {}
+    for i, path in enumerate([features_path, logits_path]):
+        cached_file = os.path.join(model_dir, '{}_{}.pt'.format(name, path[-10:]))
+        if not os.path.exists(cached_file):
+            print('Downloading parameters ({}/2)'.format(i+1))
+            s = requests.Session()
+            s.mount('https://', HTTPAdapter(max_retries=10))
+            r = s.get(path, allow_redirects=True)
+            with open(cached_file, 'wb') as f:
+                f.write(r.content)
+        state_dict.update(torch.load(cached_file))
+
+    mdl.load_state_dict(state_dict)
 
 
 def load_weights(mdl, name):
