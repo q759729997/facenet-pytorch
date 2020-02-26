@@ -1,4 +1,16 @@
 # Face Recognition Using Pytorch 
+
+## 预训练模型：
+
+- `20180402-114759-vggface2.pt`下载链接：
+
+~~~wiki
+链接：https://pan.baidu.com/s/1MwuYaB8Vr7A3R_07WDlXlA 
+提取码：ywop
+~~~
+
+## 介绍
+
 [![Downloads](https://pepy.tech/badge/facenet-pytorch)](https://pepy.tech/project/facenet-pytorch)
 
 [![Code Coverage](https://img.shields.io/codecov/c/github/timesler/facenet-pytorch.svg)](https://codecov.io/gh/timesler/facenet-pytorch)
